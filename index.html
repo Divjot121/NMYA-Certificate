@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Literating India Foundation - Nasha Mukt Yuva Certificate Portal</title>
+  <meta name="description" content="Generate official Nasha Mukt Yuva participation certificates with dynamic lookup, verification, and instant high-res PNG/PDF export.">
+  <meta name="theme-color" content="#0a1628">
+
+  <!-- OpenGraph / Social Metadata -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Literating India Foundation - Certificate Portal">
+  <meta property="og:description" content="Official Nasha Mukt Yuva participation certificate generation portal.">
+
+  <!-- Favicon (Lotus Emblem SVG) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230a1628'/><text y='.9em' font-size='70' x='15'>🪷</text></svg>">
+
+  <!-- Google Fonts: Cinzel, Playfair Display, Plus Jakarta Sans, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=JetBrains+Mono:wght@500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main Design System Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- jsPDF for Single-Page Landscape PDF Export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <div class="brand-logo-icon" aria-hidden="true">
+          <span>🪷</span>
+        </div>
+        <div class="brand-info">
+          <h1>Literating India Foundation</h1>
+          <div class="brand-tagline">
+            <span class="tricolor-dot saffron"></span>
+            <span class="tricolor-dot white"></span>
+            <span class="tricolor-dot green"></span>
+            <span>Nasha Mukt Yuva • Certificate Portal</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="open-directory-btn" class="btn btn-secondary btn-sm" type="button" title="View all participants in database">
+          <span class="icon">📋</span> All Participants (<span id="participant-count-badge">47</span>)
+        </button>
+        <button id="open-add-modal-btn" class="btn btn-gold-outline btn-sm" type="button" title="Add a new participant record">
+          <span class="icon">➕</span> Add Participant
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Application Workspace -->
+  <main class="main-wrapper">
+    <div class="app-grid">
+
+      <!-- Left Column: Step-by-Step Generation Controls -->
+      <section class="control-panel" aria-label="Certificate Generation Controls">
+
+        <!-- Step 1: Participant Search Card -->
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <div class="step-badge">Step 1</div>
+            <h2 class="panel-title">Select Participant</h2>
+          </div>
+
+          <!-- Quick Topic Category Filter Chips -->
+          <div class="topic-chips-bar" aria-label="Quick topic filter">
+            <button class="topic-chip active" type="button" data-topic="">All Topics</button>
+            <button class="topic-chip" type="button" data-topic="Debate">Debate</button>
+            <button class="topic-chip" type="button" data-topic="Declamation">Declamation</button>
+            <button class="topic-chip" type="button" data-topic="Rangoli">Rangoli</button>
+            <button class="topic-chip" type="button" data-topic="Singing">Singing</button>
+            <button class="topic-chip" type="button" data-topic="Poster Making">Poster Making</button>
+          </div>
+
+          <div class="search-box-wrapper">
+            <div class="search-input-container">
+              <span class="search-icon-prefix" aria-hidden="true">🔎</span>
+              <input 
+                type="text" 
+                id="search-input" 
+                class="search-input" 
+                placeholder="Search participant name (e.g. Harnoor, Divjot, Tanvipreet)..." 
+                autocomplete="off" 
+                spellcheck="false"
+                aria-label="Search participant by name"
+              >
+              <button id="clear-search-btn" class="clear-btn hidden" type="button" aria-label="Clear search">✕</button>
+            </div>
+
+            <!-- Autocomplete Dropdown List -->
+            <ul id="autocomplete-list" class="autocomplete-dropdown hidden" role="listbox" aria-label="Matching Participants"></ul>
+            
+            <!-- Inline Search Error -->
+            <div id="search-error" class="inline-error hidden" role="alert"></div>
+          </div>
+
+          <!-- Selected Participant Card Summary -->
+          <div id="selected-participant-card" class="selected-card hidden">
+            <div class="selected-card-header">
+              <div>
+                <span class="card-label-mini">Selected Participant</span>
+                <div id="card-name" class="selected-card-name">Participant Name</div>
+              </div>
+              <button id="change-participant-btn" class="btn btn-sm btn-card-change" type="button">Change</button>
+            </div>
+            <div class="selected-card-tags">
+              <span id="card-topic" class="badge topic-badge">Topic</span>
+              <span id="card-class" class="badge class-badge">Class</span>
+              <span id="card-cert-no" class="badge cert-badge">LIF-NMYA-2026-001</span>
+            </div>
+            <div id="card-phone-info" class="card-phone-info">Phone: •••••••• (Required)</div>
+          </div>
+        </div>
+
+        <!-- Step 2: Identity Verification Card -->
+        <div id="verification-section" class="panel-card hidden">
+          <div class="panel-card-header">
+            <div class="step-badge">Step 2</div>
+            <h2 class="panel-title">Confirm Identity</h2>
+          </div>
+
+          <div class="verification-box">
+            <!-- For records with phone number -->
+            <div>
+              <label for="phone-verify-input" class="form-label">Phone Number Confirmation</label>
+              <div class="verify-input-group">
+                <input 
+                  type="tel" 
+                  id="phone-verify-input" 
+                  class="verify-input" 
+                  placeholder="Enter 10-digit phone or last 4 digits"
+                  maxlength="14"
+                >
+                <button id="verify-btn" class="btn btn-primary" type="button">
+                  <span>🛡️</span> Verify
+                </button>
+              </div>
+              <p class="field-hint">Tip: Enter the full phone or last 4 digits for instant verification.</p>
+            </div>
+
+            <!-- For records where phone is null -->
+            <div id="null-phone-notice" class="null-phone-info hidden">
+              <div class="notice-icon">✓</div>
+              <div>
+                <strong>No Phone on Record</strong>
+                <p>Identity is confirmed based on the verified Topic & Class selection.</p>
+              </div>
+            </div>
+
+            <!-- Status message container -->
+            <div id="verification-message" class="verification-message hidden" role="status"></div>
+          </div>
+        </div>
+
+        <!-- Step 3: Event Details Card -->
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <div class="step-badge">Step 3</div>
+            <h2 class="panel-title">Event & Certificate Details</h2>
+          </div>
+
+          <div class="form-group">
+            <label for="school-input" class="form-label">School / Institution</label>
+            <div class="input-with-icon">
+              <span class="input-icon">🏛️</span>
+              <input 
+                type="text" 
+                id="school-input" 
+                class="form-input" 
+                value="SGHPS CHOWK PRAGDASS" 
+                placeholder="e.g. SGHPS CHOWK PRAGDASS"
+              >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="date-input" class="form-label">Issue Date</label>
+            <div class="input-with-icon">
+              <span class="input-icon">📅</span>
+              <input 
+                type="text" 
+                id="date-input" 
+                class="form-input" 
+                value="28 August 2026"
+                placeholder="e.g. 28 August 2026"
+              >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Certificate Serial Number (Unique per ID)</label>
+            <div class="cert-no-box">
+              <div class="cert-no-label-group">
+                <span class="cert-no-icon">🔢</span>
+                <span id="cert-no-display" class="cert-no-code">LIF-NMYA-2026-001</span>
+              </div>
+              <button id="edit-cert-no-btn" class="btn btn-sm btn-outline" type="button">Edit</button>
+            </div>
+            <input 
+              type="text" 
+              id="cert-no-input" 
+              class="form-input hidden" 
+              style="margin-top: 0.4rem;" 
+              placeholder="Custom certificate serial number"
+            >
+          </div>
+        </div>
+
+        <!-- Step 4: Export & Download Actions Card -->
+        <div class="panel-card export-card">
+          <div class="panel-card-header">
+            <div class="step-badge gold">Step 4</div>
+            <h2 class="panel-title">Export Certificate</h2>
+          </div>
+
+          <div class="export-actions">
+            <button id="download-png-btn" class="btn btn-gold btn-lg btn-full" type="button" disabled>
+              <span class="icon">🖼️</span> Download Certificate (PNG)
+            </button>
+            <button id="download-pdf-btn" class="btn btn-primary btn-full" type="button" disabled>
+              <span class="icon">📄</span> Download Single-Page PDF
+            </button>
+            <button id="print-cert-btn" class="btn btn-secondary btn-full" type="button" disabled>
+              <span class="icon">🖨️</span> Print Certificate
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Right Column: Interactive Live Certificate Studio Viewport -->
+      <section class="preview-panel" aria-label="Certificate Preview Studio">
+        <div class="preview-toolbar">
+          <div class="preview-title-group">
+            <h2><span>📜</span> Live Certificate Studio</h2>
+            <span class="live-status-pill">
+              <span class="pulse-dot"></span> High-Resolution 1492×1054
+            </span>
+          </div>
+
+          <div class="preview-zoom-controls">
+            <button id="zoom-out-btn" class="btn btn-sm btn-icon" type="button" title="Zoom Out" aria-label="Zoom Out">🔍−</button>
+            <span id="zoom-level" class="zoom-level-text">55%</span>
+            <button id="zoom-in-btn" class="btn btn-sm btn-icon" type="button" title="Zoom In" aria-label="Zoom In">🔍+</button>
+            <button id="zoom-fit-btn" class="btn btn-sm btn-outline" type="button" title="Fit to Screen">Fit</button>
+          </div>
+        </div>
+
+        <div id="canvas-wrapper" class="canvas-wrapper">
+          <!-- Empty State when nothing is selected -->
+          <div id="preview-empty-state" class="empty-state">
+            <div class="empty-illustration">
+              <div class="empty-cert-frame">
+                <span class="empty-cert-icon">🎓</span>
+              </div>
+            </div>
+            <h3>Ready to Generate Official Certificate</h3>
+            <p>Search or pick any of the 47 participants on the left to instantly preview and download their personalized certificate.</p>
+            <div class="quick-start-hint">
+              <span>💡 Try searching:</span>
+              <button class="hint-chip" type="button" onclick="document.getElementById('search-input').value='Tanvipreet';document.getElementById('search-input').dispatchEvent(new Event('input'))">Tanvipreet</button>
+              <button class="hint-chip" type="button" onclick="document.getElementById('search-input').value='Harnoor';document.getElementById('search-input').dispatchEvent(new Event('input'))">Harnoor</button>
+              <button class="hint-chip" type="button" onclick="document.getElementById('search-input').value='Divjot';document.getElementById('search-input').dispatchEvent(new Event('input'))">Divjot</button>
+            </div>
+          </div>
+
+          <!-- Canvas Container -->
+          <div id="canvas-container" class="canvas-container hidden">
+            <div class="canvas-stage">
+              <canvas id="certificate-canvas" width="1492" height="1054" aria-label="Certificate preview canvas"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Mobile Floating Quick Action Bar (Visible when verified) -->
+  <div id="mobile-floating-bar" class="mobile-floating-bar hidden">
+    <button id="mobile-quick-png" class="btn btn-gold btn-sm" type="button">
+      <span>🖼️</span> Download PNG
+    </button>
+    <button id="mobile-quick-pdf" class="btn btn-primary btn-sm" type="button">
+      <span>📄</span> PDF
+    </button>
+  </div>
+
+  <!-- Add Participant Modal -->
+  <div id="add-participant-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="add-modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="add-modal-title"><span>➕</span> Add New Participant</h3>
+        <button id="close-add-modal-btn" class="modal-close-btn" type="button" aria-label="Close dialog">✕</button>
+      </div>
+      <form id="add-participant-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="new-name" class="form-label">Full Name *</label>
+            <input type="text" id="new-name" class="form-input" placeholder="e.g. Navjot Singh" required>
+          </div>
+          <div class="form-group">
+            <label for="new-topic" class="form-label">Topic / Competition *</label>
+            <input type="text" id="new-topic" class="form-input" list="topic-suggestions" placeholder="e.g. Debate, Rangoli, Declamation" required>
+            <datalist id="topic-suggestions">
+              <option value="Debate"></option>
+              <option value="Declamation"></option>
+              <option value="Rangoli"></option>
+              <option value="Singing"></option>
+              <option value="Poster Making"></option>
+            </datalist>
+          </div>
+          <div class="form-group">
+            <label for="new-class" class="form-label">Class *</label>
+            <select id="new-class" class="form-input" required>
+              <option value="6th">6th</option>
+              <option value="7th">7th</option>
+              <option value="8th">8th</option>
+              <option value="9th">9th</option>
+              <option value="10th">10th</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="new-phone" class="form-label">Phone Number (Optional)</label>
+            <input type="tel" id="new-phone" class="form-input" placeholder="e.g. 9812345678" maxlength="12">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('add-participant-modal').classList.add('hidden')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save & Select</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Participant Directory Modal -->
+  <div id="directory-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="directory-modal-title">
+    <div class="modal-card modal-card-lg">
+      <div class="modal-header">
+        <h3 id="directory-modal-title"><span>📋</span> Participants Directory (All Records)</h3>
+        <button id="close-directory-btn" class="modal-close-btn" type="button" aria-label="Close directory">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="directory-filters">
+          <input type="text" id="directory-search-input" class="form-input" style="flex: 1; min-width: 200px;" placeholder="Filter by name, phone, or serial number...">
+          <select id="directory-topic-filter" class="form-input" style="width: auto;">
+            <option value="">All Topics</option>
+            <option value="Debate">Debate</option>
+            <option value="Declamation">Declamation</option>
+            <option value="Rangoli">Rangoli</option>
+            <option value="Singing">Singing</option>
+            <option value="Poster Making">Poster Making</option>
+          </select>
+          <select id="directory-class-filter" class="form-input" style="width: auto;">
+            <option value="">All Classes</option>
+            <option value="6th">6th</option>
+            <option value="7th">7th</option>
+            <option value="8th">8th</option>
+            <option value="9th">9th</option>
+          </select>
+        </div>
+        <div class="directory-table-container">
+          <table class="directory-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Cert No.</th>
+                <th>Name</th>
+                <th>Topic</th>
+                <th>Class</th>
+                <th>Phone</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="directory-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('directory-modal').classList.add('hidden')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/certificate.js"></script>
+  <script src="js/pdf-exporter.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

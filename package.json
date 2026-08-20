@@ -1,0 +1,22 @@
+{
+  "name": "lif-dynamic-certificate-generator",
+  "version": "1.0.0",
+  "description": "Literating India Foundation - Nasha Mukt Yuva Participation Certificate Generator",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx -y serve . -l 3000",
+    "start": "npx -y serve . -l 3000",
+    "build": "node test_suite.js",
+    "test": "node test_suite.js"
+  },
+  "keywords": [
+    "certificate",
+    "canvas",
+    "generator",
+    "lif",
+    "nasha-mukt-bharat",
+    "vercel"
+  ],
+  "author": "Literating India Foundation",
+  "license": "MIT"
+}
