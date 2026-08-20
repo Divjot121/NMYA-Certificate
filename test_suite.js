@@ -47,13 +47,13 @@ function assert(condition, message) {
 
 console.log('=== TEST SUITE 1: Dataset & Unique IDs ===');
 const participants = window.ParticipantData.getParticipants();
-assert(participants.length === 47, `Total embedded participants count is 47 (got ${participants.length})`);
+assert(participants.length === 48, `Total embedded participants count is 48 (got ${participants.length})`);
 assert(participants[0].id === 1 && participants[0].name === 'Rajdeep Singh', 'First participant has ID 1 (Rajdeep Singh)');
-assert(participants[46].id === 47 && participants[46].name === 'Harnoor Kaur', 'Last participant has ID 47 (Harnoor Kaur)');
+assert(participants[47].id === 48 && participants[47].name === 'Demo Participant', 'Last participant has ID 48 (Demo Participant)');
 
 // Check unique IDs
 const idSet = new Set(participants.map(p => p.id));
-assert(idSet.size === 47, 'All 47 IDs are unique');
+assert(idSet.size === 48, 'All 48 IDs are unique');
 
 console.log('\n=== TEST SUITE 2: Duplicate Names Disambiguation ===');
 const harnoorMatches = window.ParticipantData.searchParticipantsByName('Harnoor Kaur');
@@ -121,9 +121,9 @@ const added = window.ParticipantData.addCustomParticipant({
   class: '9th',
   phone: '9876543210'
 });
-assert(added.id === 48, `New custom participant gets ID 48 (got ${added.id})`);
+assert(added.id === 49, `New custom participant gets ID 49 (got ${added.id})`);
 assert(added.name === 'Test New Student', 'New participant name matches');
-assert(window.ParticipantData.getParticipants().length === 48, 'Total participants now 48');
+assert(window.ParticipantData.getParticipants().length === 49, 'Total participants now 49');
 
 console.log(`\n=============================================`);
 console.log(`TEST SUMMARY: ${passCount} Passed, ${failCount} Failed`);

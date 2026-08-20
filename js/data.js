@@ -51,7 +51,8 @@ const INITIAL_PARTICIPANTS = [
   {"name":"Sharanpreet Kaur","phone":"7973166901","topic":"Poster Making","class":"8th"},
   {"name":"Seerat Kaur","phone":"7973166901","topic":"Poster Making","class":"8th"},
   {"name":"Harleen Kaur","phone":"7986074854","topic":"Poster Making","class":"8th"},
-  {"name":"Harnoor Kaur","phone":"9888818381","topic":"Poster Making","class":"8th"}
+  {"name":"Harnoor Kaur","phone":"9888818381","topic":"Poster Making","class":"8th"},
+  {"name":"Demo Participant","phone":"9876543210","topic":"Debate","class":"8th"}
 ];
 
 const STORAGE_KEY_CUSTOM_PARTICIPANTS = 'lif_custom_participants_v1';
