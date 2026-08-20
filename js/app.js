@@ -646,28 +646,32 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // Inputs real-time listener
-  schoolInput.addEventListener('input', refreshCertificate);
-  dateInput.addEventListener('input', refreshCertificate);
-  certNoInput.addEventListener('input', () => {
-    customCertNoOverride = certNoInput.value;
-    updateCertNoDisplay();
-    refreshCertificate();
-  });
-
-  editCertNoBtn.addEventListener('click', () => {
-    if (certNoInput.classList.contains('hidden')) {
-      certNoInput.classList.remove('hidden');
-      certNoInput.value = getFormattedCertNo(currentParticipant);
-      certNoInput.focus();
-      editCertNoBtn.textContent = 'Save';
-    } else {
-      customCertNoOverride = certNoInput.value.trim() || null;
-      certNoInput.classList.add('hidden');
-      editCertNoBtn.textContent = 'Edit';
+  if (schoolInput) schoolInput.addEventListener('input', refreshCertificate);
+  if (dateInput) dateInput.addEventListener('input', refreshCertificate);
+  if (certNoInput) {
+    certNoInput.addEventListener('input', () => {
+      customCertNoOverride = certNoInput.value;
       updateCertNoDisplay();
       refreshCertificate();
-    }
-  });
+    });
+  }
+
+  if (editCertNoBtn && certNoInput) {
+    editCertNoBtn.addEventListener('click', () => {
+      if (certNoInput.classList.contains('hidden')) {
+        certNoInput.classList.remove('hidden');
+        certNoInput.value = getFormattedCertNo(currentParticipant);
+        certNoInput.focus();
+        editCertNoBtn.textContent = 'Save';
+      } else {
+        customCertNoOverride = certNoInput.value.trim() || null;
+        certNoInput.classList.add('hidden');
+        editCertNoBtn.textContent = 'Edit';
+        updateCertNoDisplay();
+        refreshCertificate();
+      }
+    });
+  }
 
   // Export Buttons
   downloadPngBtn.addEventListener('click', downloadPNG);
