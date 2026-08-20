@@ -83,14 +83,15 @@ function simulatePhoneVerify(participant, enteredPhone) {
   const entered = enteredPhone.trim().replace(/\D/g, '');
   const actual = participant.phone.trim().replace(/\D/g, '');
   if (!entered) return { verified: false, reason: 'empty' };
-  const isMatch = entered === actual || (entered.length >= 4 && actual.endsWith(entered));
+  if (entered.length < 10) return { verified: false, reason: 'incomplete' };
+  const isMatch = (entered === actual);
   return { verified: isMatch, reason: isMatch ? 'ok' : 'mismatch' };
 }
 
 // Harnoor #2 verification
 const h2 = harnoorMatches[1];
 assert(simulatePhoneVerify(h2, '9815046097').verified === true, 'Full 10-digit phone match succeeds');
-assert(simulatePhoneVerify(h2, '6097').verified === true, 'Last 4-digit phone match succeeds');
+assert(simulatePhoneVerify(h2, '6097').verified === false, 'Partial 4-digit input fails (Full 10-digit required)');
 assert(simulatePhoneVerify(h2, '9999999999').verified === false, 'Mismatched phone number fails');
 assert(simulatePhoneVerify(h2, '').verified === false, 'Empty phone input fails');
 

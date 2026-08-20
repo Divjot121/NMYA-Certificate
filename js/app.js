@@ -306,7 +306,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (participant.phone) {
-      cardPhoneInfo.textContent = `Phone: ••••••••${participant.phone.slice(-2)} (Verification required)`;
+      cardPhoneInfo.textContent = `Phone: •••••••••• (Full 10-digit confirmation required)`;
       cardPhoneInfo.className = 'card-phone-info phone-required';
     } else {
       cardPhoneInfo.textContent = 'Phone: Not Registered (Auto-verified by Topic & Class)';
@@ -340,7 +340,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   /**
-   * Phone Confirmation Validation
+   * Phone Confirmation Validation (Strict 10-Digit Match)
    */
   function verifyPhoneNumber() {
     if (!currentParticipant) return;
@@ -356,22 +356,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     const actual = currentParticipant.phone.trim().replace(/\D/g, '');
 
     if (!entered) {
-      showVerificationError('⚠️ Please enter the registered phone number to confirm identity.');
+      showVerificationError('⚠️ Please enter the full 10-digit registered phone number.');
       isVerified = false;
       refreshCertificate();
       return;
     }
 
-    // Match either full 10-digit number or last 4 digits
-    const isMatch = entered === actual || (entered.length >= 4 && actual.endsWith(entered));
+    if (entered.length < 10) {
+      showVerificationError('⚠️ Full 10-digit phone number is required (e.g. 9876543210).');
+      isVerified = false;
+      refreshCertificate();
+      return;
+    }
+
+    // Require strict full 10-digit match
+    const isMatch = (entered === actual);
 
     if (isMatch) {
       isVerified = true;
-      showVerificationSuccess('✓ Phone Number Verified! Ready to Generate.');
+      showVerificationSuccess('✓ Identity Verified! Ready to Generate.');
       refreshCertificate();
     } else {
       isVerified = false;
-      showVerificationError(`❌ Phone number mismatch! Did not match the record for "${currentParticipant.name}" (${currentParticipant.topic}, ${currentParticipant.class}).`);
+      showVerificationError(`❌ Phone number mismatch! Did not match the registered record for "${currentParticipant.name}" (${currentParticipant.topic}, ${currentParticipant.class}).`);
       refreshCertificate();
     }
   }
@@ -663,7 +670,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const val = e.target.value.trim().replace(/\D/g, '');
     if (currentParticipant && currentParticipant.phone) {
       const actual = currentParticipant.phone.trim().replace(/\D/g, '');
-      if (val === actual || (val.length === 4 && actual.endsWith(val))) {
+      if (val.length === 10 && val === actual) {
         verifyPhoneNumber();
       }
     }
