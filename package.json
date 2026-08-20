@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "npx -y serve . -l 3000",
     "start": "npx -y serve . -l 3000",
-    "build": "node test_suite.js",
     "test": "node test_suite.js"
   },
   "keywords": [
