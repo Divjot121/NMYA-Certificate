@@ -429,39 +429,57 @@ document.addEventListener('DOMContentLoaded', async () => {
    * Export Handlers
    */
   async function downloadPNG() {
-    if (!currentParticipant || !isVerified) return;
+    if (!currentParticipant || !isVerified) {
+      showToast('⚠️ Please select and verify a participant first.');
+      return;
+    }
     const safeName = currentParticipant.name.replace(/[^a-zA-Z0-9]/g, '_');
     const safeTopic = currentParticipant.topic.replace(/[^a-zA-Z0-9]/g, '_');
     const filename = `LIF_Certificate_${safeName}_${safeTopic}_${currentParticipant.class}.png`;
 
-    const dataUrl = renderer.toDataURL('image/png', 1.0);
-    const link = document.createElement('a');
-    link.download = filename;
-    link.href = dataUrl;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      downloadPngBtn.disabled = true;
+      const dataUrl = canvasElement.toDataURL('image/png', 1.0);
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = dataUrl;
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(() => document.body.removeChild(link), 100);
 
-    showToast(`✅ PNG Certificate (${getFormattedCertNo()}) downloaded for ${currentParticipant.name}!`);
+      showToast(`✅ PNG Certificate downloaded for ${currentParticipant.name}!`);
+    } catch (err) {
+      console.error('PNG export failed:', err);
+      showToast('❌ PNG export failed.');
+    } finally {
+      downloadPngBtn.disabled = false;
+    }
   }
 
   async function downloadPDF() {
-    if (!currentParticipant || !isVerified) return;
+    if (!currentParticipant || !isVerified) {
+      showToast('⚠️ Please select and verify a participant first.');
+      return;
+    }
     const safeName = currentParticipant.name.replace(/[^a-zA-Z0-9]/g, '_');
     const safeTopic = currentParticipant.topic.replace(/[^a-zA-Z0-9]/g, '_');
     const filename = `LIF_Certificate_${safeName}_${safeTopic}_${currentParticipant.class}.pdf`;
 
     try {
       downloadPdfBtn.disabled = true;
-      downloadPdfBtn.textContent = 'Generating PDF...';
+      downloadPdfBtn.innerHTML = '<span class="icon">⏳</span> Generating PDF...';
+      if (mobileQuickPdf) mobileQuickPdf.disabled = true;
+
       await CertificatePdfExporter.exportPdf(canvasElement, filename);
-      showToast(`✅ PDF Certificate (${getFormattedCertNo()}) downloaded for ${currentParticipant.name}!`);
+      showToast(`✅ PDF Certificate downloaded for ${currentParticipant.name}!`);
     } catch (err) {
       console.error('PDF export failed:', err);
-      showToast('❌ PDF export failed. Please try PNG download.');
+      showToast('❌ PDF export error. Downloading PNG instead...');
+      await downloadPNG();
     } finally {
       downloadPdfBtn.disabled = false;
-      downloadPdfBtn.innerHTML = '<span class="icon">📄</span> Download PDF';
+      downloadPdfBtn.innerHTML = '<span class="icon">📄</span> Download Single-Page PDF';
+      if (mobileQuickPdf) mobileQuickPdf.disabled = false;
     }
   }
 
