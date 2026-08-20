@@ -231,6 +231,15 @@
               <span class="icon">🖨️</span> Print Certificate
             </button>
           </div>
+
+          <!-- Support Callout -->
+          <div class="support-callout">
+            <span class="support-icon">💬</span>
+            <div class="support-text">
+              <span>Encountering any issue while downloading certificate?</span>
+              <button id="open-support-btn" class="support-link-btn" type="button">Contact Us</button>
+            </div>
+          </div>
         </div>
 
       </section>
@@ -388,6 +397,66 @@
       </div>
     </div>
   </div>
+
+  <!-- Contact Us & Support Modal -->
+  <div id="support-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="support-modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="support-modal-title"><span>💬</span> Help & Contact Support</h3>
+        <button id="close-support-btn" class="modal-close-btn" type="button" aria-label="Close support dialog">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="support-intro">
+          <p>Encountering any issue while generating or downloading your certificate? Reach out to our event coordinators:</p>
+        </div>
+
+        <div class="support-channels">
+          <div class="support-channel-card">
+            <div class="channel-icon">📧</div>
+            <div class="channel-details">
+              <strong>Email Support</strong>
+              <p>support@literatingindia.org</p>
+              <a href="mailto:support@literatingindia.org?subject=Certificate%20Support%20-%20Nasha%20Mukt%20Yuva" class="btn btn-sm btn-outline" style="margin-top: 0.35rem;">Send Email</a>
+            </div>
+          </div>
+
+          <div class="support-channel-card">
+            <div class="channel-icon">📱</div>
+            <div class="channel-details">
+              <strong>WhatsApp & Helpline</strong>
+              <p>+91 97790 85865 / +91 99149 91466</p>
+              <a href="https://wa.me/919779085865?text=Hello%2C%20I%20need%20assistance%20with%20my%20Nasha%20Mukt%20Yuva%20Certificate." target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-gold" style="margin-top: 0.35rem;">Chat on WhatsApp</a>
+            </div>
+          </div>
+
+          <div class="support-channel-card">
+            <div class="channel-icon">🏛️</div>
+            <div class="channel-details">
+              <strong>Event Institution</strong>
+              <p>SGHPS CHOWK PRAGDASS, Amritsar</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('support-modal').classList.add('hidden')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <span class="footer-logo">🪷</span>
+        <span>Literating India Foundation • Nasha Mukt Bharat Abhiyaan</span>
+      </div>
+      <div class="footer-support">
+        <span>Encountering any issue?</span>
+        <button id="footer-support-btn" class="support-link-btn" type="button">Contact Us</button>
+      </div>
+    </div>
+  </footer>
 
   <!-- Scripts -->
   <script src="js/data.js"></script>

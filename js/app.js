@@ -72,6 +72,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   const directoryClassFilter = document.getElementById('directory-class-filter');
   const participantCountBadge = document.getElementById('participant-count-badge');
 
+  // Support Modal Elements
+  const openSupportBtn = document.getElementById('open-support-btn');
+  const footerSupportBtn = document.getElementById('footer-support-btn');
+  const closeSupportBtn = document.getElementById('close-support-btn');
+  const supportModal = document.getElementById('support-modal');
+
   // Application State
   let currentParticipant = null;
   let isVerified = false;
@@ -714,6 +720,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   directorySearchInput.addEventListener('input', populateDirectoryTable);
   directoryTopicFilter.addEventListener('change', populateDirectoryTable);
   directoryClassFilter.addEventListener('change', populateDirectoryTable);
+
+  // Support Modal Listeners
+  if (openSupportBtn && supportModal) {
+    openSupportBtn.addEventListener('click', () => supportModal.classList.remove('hidden'));
+  }
+  if (footerSupportBtn && supportModal) {
+    footerSupportBtn.addEventListener('click', () => supportModal.classList.remove('hidden'));
+  }
+  if (closeSupportBtn && supportModal) {
+    closeSupportBtn.addEventListener('click', () => supportModal.classList.add('hidden'));
+  }
 
   // Mobile Floating Quick Action Buttons
   if (mobileQuickPng) {
