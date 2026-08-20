@@ -390,7 +390,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function showVerificationError(msg) {
-    verificationMessage.textContent = msg;
+    const participantInfo = currentParticipant ? ` for ${currentParticipant.name} (${currentParticipant.topic}, Class ${currentParticipant.class})` : '';
+    const whatsappUrl = `https://wa.me/918968413993?text=Hello%2C%20I%20am%20having%20trouble%20verifying%20my%20phone%20number${encodeURIComponent(participantInfo)}%20for%20the%20Nasha%20Mukt%20Yuva%20Certificate.`;
+
+    verificationMessage.innerHTML = `
+      <div class="verify-error-content">
+        <span>${escapeHtml(msg)}</span>
+        <div class="verify-error-action">
+          <span>Facing an issue or forgot registered number?</span>
+          <a href="${whatsappUrl}" target="_blank" rel="noopener noreferrer" class="verify-contact-link">Contact Us (WhatsApp)</a>
+        </div>
+      </div>
+    `;
     verificationMessage.className = 'verification-message error';
     verificationMessage.classList.remove('hidden');
   }

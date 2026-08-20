@@ -597,8 +597,39 @@ body {
 
 .verification-message.error {
   background: var(--color-error-bg);
-  border: 1px solid var(--color-error-border);
+  border: 1.5px solid var(--color-error-border);
   color: var(--color-error);
+}
+
+.verify-error-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.verify-error-action {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.76rem;
+  border-top: 1px dashed rgba(220, 38, 38, 0.25);
+  padding-top: 0.35rem;
+  margin-top: 0.15rem;
+  color: #991b1b;
+}
+
+.verify-contact-link {
+  color: #b91c1c;
+  font-weight: 800;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.verify-contact-link:hover {
+  color: #7f1d1d;
 }
 
 .null-phone-info {
