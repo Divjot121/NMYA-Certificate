@@ -682,6 +682,34 @@ body {
   box-shadow: 0 0 0 3px rgba(18, 43, 80, 0.12);
 }
 
+.form-input:disabled,
+.form-input[readonly],
+.form-input-disabled {
+  background-color: #f1f5f9 !important;
+  color: #64748b !important;
+  border-color: #e2e8f0 !important;
+  cursor: not-allowed !important;
+  user-select: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  pointer-events: none !important;
+}
+
+.fixed-pill {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--color-navy-700);
+  background: var(--color-navy-100);
+  padding: 0.12rem 0.45rem;
+  border-radius: 4px;
+  margin-left: 0.4rem;
+  text-transform: none;
+  letter-spacing: 0;
+  vertical-align: middle;
+  display: inline-flex;
+  align-items: center;
+}
+
 .cert-no-box {
   display: flex;
   align-items: center;
