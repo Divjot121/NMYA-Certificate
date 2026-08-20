@@ -245,7 +245,8 @@ body {
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: visible;
+  position: relative;
 }
 
 .panel-card-header {
@@ -321,6 +322,7 @@ body {
 .search-box-wrapper {
   position: relative;
   width: 100%;
+  z-index: 150;
 }
 
 .search-input-container {
@@ -369,29 +371,33 @@ body {
   padding: 0.25rem 0.5rem;
 }
 
-/* Autocomplete Dropdown */
+/* Autocomplete Dropdown Overlay */
 .autocomplete-dropdown {
   position: absolute;
-  top: calc(100% + 4px);
+  top: calc(100% + 5px);
   left: 0;
   right: 0;
-  background: var(--color-surface);
-  border: 1.5px solid var(--color-border);
+  background: #ffffff;
+  border: 1.5px solid var(--color-navy-700);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-xl);
-  max-height: 260px;
+  box-shadow: 0 16px 36px rgba(10, 22, 40, 0.28), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  max-height: 280px;
   overflow-y: auto;
-  z-index: 100;
+  z-index: 9999;
   list-style: none;
-  padding: 0.25rem 0;
+  padding: 0.35rem 0;
   width: 100%;
   box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
 }
 
 .autocomplete-item {
-  padding: 0.65rem 0.85rem;
+  padding: 0.75rem 0.95rem;
   cursor: pointer;
   border-bottom: 1px solid var(--color-border-light);
+  background: #ffffff;
+  transition: background 0.15s ease;
+  touch-action: manipulation;
 }
 
 .autocomplete-item:last-child {

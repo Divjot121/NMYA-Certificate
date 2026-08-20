@@ -219,7 +219,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       `;
 
-      li.addEventListener('click', () => {
+      li.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        selectParticipant(item);
+      });
+      li.addEventListener('click', (e) => {
+        e.preventDefault();
         selectParticipant(item);
       });
 
@@ -615,7 +620,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     searchInput.focus();
   });
 
-  document.addEventListener('click', (e) => {
+  document.addEventListener('pointerdown', (e) => {
     if (!e.target.closest('.search-box-wrapper')) {
       autocompleteList.classList.add('hidden');
     }
