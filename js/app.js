@@ -398,22 +398,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   /**
-   * Canvas Zoom & Pan Controls
+   * Canvas Zoom & Pan Controls (Responsive Container Width)
    */
   function setZoom(scale) {
-    currentZoom = Math.max(0.2, Math.min(1.5, scale));
-    canvasElement.style.transform = `scale(${currentZoom})`;
+    currentZoom = Math.max(0.5, Math.min(1.5, scale));
+    const stage = document.querySelector('.canvas-stage');
+    if (stage && canvasWrapper) {
+      const availableWidth = canvasWrapper.clientWidth - 16;
+      const targetWidth = Math.min(availableWidth, Math.round(820 * currentZoom));
+      stage.style.maxWidth = `${targetWidth}px`;
+    }
     zoomLevelDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
   }
 
   function fitToView() {
-    if (!canvasWrapper) return;
-    const padding = window.innerWidth < 600 ? 16 : 40;
-    const containerWidth = canvasWrapper.clientWidth - padding;
-    if (containerWidth > 0) {
-      const targetScale = Math.min(1.0, containerWidth / CERT_CONFIG.CANVAS_WIDTH);
-      setZoom(targetScale);
+    currentZoom = 1.0;
+    const stage = document.querySelector('.canvas-stage');
+    if (stage) {
+      stage.style.maxWidth = '100%';
     }
+    zoomLevelDisplay.textContent = '100%';
   }
 
   /**
