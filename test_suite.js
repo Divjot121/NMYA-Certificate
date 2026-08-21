@@ -145,6 +145,23 @@ assert(Array.isArray(dbParticipants) && dbParticipants.length === 48, 'Database 
 assert(window.ParticipantData.getParticipantById(1).name === 'Rajdeep Singh', 'Participant lookup by ID 1 matches authoritative dataset');
 assert(window.ParticipantData.getParticipantById(48).name === 'Demo Participant', 'Participant lookup by ID 48 matches authoritative dataset');
 
+console.log('\n=== TEST SUITE 7: Dual Theme (Dark/Light) State Management ===');
+function resolveThemePreference(stored, systemPrefersDark) {
+  if (stored === 'dark' || stored === 'light') return stored;
+  return systemPrefersDark ? 'dark' : 'light';
+}
+
+function getNextTheme(currentTheme) {
+  return currentTheme === 'dark' ? 'light' : 'dark';
+}
+
+assert(resolveThemePreference('dark', false) === 'dark', 'Explicit dark preference respected regardless of system theme');
+assert(resolveThemePreference('light', true) === 'light', 'Explicit light preference respected regardless of system theme');
+assert(resolveThemePreference(null, true) === 'dark', 'System dark preference fallback works cleanly');
+assert(resolveThemePreference(null, false) === 'light', 'System light preference fallback works cleanly');
+assert(getNextTheme('light') === 'dark', 'Theme toggle switches light -> dark cleanly');
+assert(getNextTheme('dark') === 'light', 'Theme toggle switches dark -> light cleanly');
+
 console.log(`\n=============================================`);
 console.log(`TEST SUMMARY: ${passCount} Passed, ${failCount} Failed`);
 console.log(`=============================================`);

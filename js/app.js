@@ -79,6 +79,68 @@ document.addEventListener('DOMContentLoaded', async () => {
   const closeSupportBtn = document.getElementById('close-support-btn');
   const supportModal = document.getElementById('support-modal');
 
+  // Theme Toggle Elements & State Management
+  const themeToggleBtn = document.getElementById('theme-toggle-btn');
+  const themeIcon = document.getElementById('theme-icon');
+  const themeLabel = document.getElementById('theme-label');
+  const THEME_STORAGE_KEY = 'lif_portal_theme_v1';
+
+  function getPreferredTheme() {
+    try {
+      const stored = localStorage.getItem(THEME_STORAGE_KEY);
+      if (stored === 'dark' || stored === 'light') return stored;
+    } catch (e) {}
+    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  }
+
+  function applyTheme(theme, save = true) {
+    document.documentElement.setAttribute('data-theme', theme);
+    if (save) {
+      try {
+        localStorage.setItem(THEME_STORAGE_KEY, theme);
+      } catch (e) {}
+    }
+    if (themeIcon && themeLabel) {
+      if (theme === 'dark') {
+        themeIcon.textContent = '☀️';
+        themeLabel.textContent = 'Light';
+        if (themeToggleBtn) {
+          themeToggleBtn.title = 'Switch to Clean Light Mode';
+          themeToggleBtn.setAttribute('aria-label', 'Switch to Clean Light Mode');
+        }
+      } else {
+        themeIcon.textContent = '🌙';
+        themeLabel.textContent = 'Dark';
+        if (themeToggleBtn) {
+          themeToggleBtn.title = 'Switch to Midnight Dark Mode';
+          themeToggleBtn.setAttribute('aria-label', 'Switch to Midnight Dark Mode');
+        }
+      }
+    }
+  }
+
+  // Initialize theme
+  const initialTheme = getPreferredTheme();
+  applyTheme(initialTheme, false);
+
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const nextTheme = current === 'dark' ? 'light' : 'dark';
+      applyTheme(nextTheme, true);
+    });
+  }
+
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      try {
+        if (!localStorage.getItem(THEME_STORAGE_KEY)) {
+          applyTheme(e.matches ? 'dark' : 'light', false);
+        }
+      } catch (err) {}
+    });
+  }
+
   // Application State
   let currentParticipant = null;
   let isVerified = false;
@@ -208,12 +270,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       li.className = 'autocomplete-item';
       li.dataset.index = index;
 
-      // Highlight match in name
-      const regex = new RegExp(`(${escapeRegex(query.trim())})`, 'gi');
-      const highlightedName = item.name.replace(regex, '<mark>$1</mark>');
+      // Safely highlight match in name
+      const safeName = escapeHtml(item.name);
+      const safeQuery = escapeRegex(escapeHtml(query.trim()));
+      const regex = new RegExp(`(${safeQuery})`, 'gi');
+      const highlightedName = safeName.replace(regex, '<mark>$1</mark>');
 
       const phoneDisplay = item.phone
-        ? `<span class="badge phone-badge">📱 •••• ${item.phone.slice(-4)}</span>`
+        ? `<span class="badge phone-badge">📱 •••• ${escapeHtml(item.phone.slice(-4))}</span>`
         : `<span class="badge no-phone-badge">No Phone</span>`;
 
       li.innerHTML = `
@@ -659,11 +723,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td><strong>#${p.id}</strong></td>
-        <td><code style="font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; color: var(--color-navy-800);">${certNo}</code></td>
+        <td><code style="font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; color: var(--color-text-main);">${escapeHtml(certNo)}</code></td>
         <td><strong>${escapeHtml(p.name)}</strong></td>
         <td><span class="badge topic-badge">${escapeHtml(p.topic)}</span></td>
         <td><span class="badge class-badge">${escapeHtml(p.class)}</span></td>
-        <td>${p.phone ? `•••• ${p.phone.slice(-4)}` : '<em class="text-muted">None</em>'}</td>
+        <td>${p.phone ? `•••• ${escapeHtml(p.phone.slice(-4))}` : '<em style="color: var(--color-text-muted);">None</em>'}</td>
         <td>
           <button class="btn btn-sm btn-primary select-dir-btn" data-id="${p.id}">Select</button>
         </td>
