@@ -56,11 +56,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const emptyState = document.getElementById('preview-empty-state');
   const canvasContainer = document.getElementById('canvas-container');
 
-  // Add Participant Modal Elements
-  const openAddModalBtn = document.getElementById('open-add-modal-btn');
-  const addModal = document.getElementById('add-participant-modal');
-  const closeAddModalBtn = document.getElementById('close-add-modal-btn');
-  const addParticipantForm = document.getElementById('add-participant-form');
 
   // Directory Modal Elements
   const openDirectoryBtn = document.getElementById('open-directory-btn');
@@ -215,7 +210,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       li.innerHTML = `
         <div class="item-header">
           <span class="item-name">${highlightedName}</span>
-          ${item.isCustom ? '<span class="badge custom-badge">Custom</span>' : ''}
         </div>
         <div class="item-details">
           <span class="badge topic-badge">${escapeHtml(item.topic)}</span>
@@ -564,7 +558,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       tr.innerHTML = `
         <td><strong>#${p.id}</strong></td>
         <td><code style="font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; color: var(--color-navy-800);">${certNo}</code></td>
-        <td><strong>${escapeHtml(p.name)}</strong> ${p.isCustom ? '<span class="badge custom-badge">Custom</span>' : ''}</td>
+        <td><strong>${escapeHtml(p.name)}</strong></td>
         <td><span class="badge topic-badge">${escapeHtml(p.topic)}</span></td>
         <td><span class="badge class-badge">${escapeHtml(p.class)}</span></td>
         <td>${p.phone ? `•••• ${p.phone.slice(-4)}` : '<em class="text-muted">None</em>'}</td>
@@ -587,35 +581,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  /**
-   * Add Participant Form
-   */
-  function handleAddParticipantSubmit(e) {
-    e.preventDefault();
-    const name = document.getElementById('new-name').value.trim();
-    const topic = document.getElementById('new-topic').value.trim();
-    const classVal = document.getElementById('new-class').value.trim();
-    const phone = document.getElementById('new-phone').value.trim() || null;
-
-    if (!name || !topic || !classVal) {
-      alert('Please fill in Name, Topic, and Class.');
-      return;
-    }
-
-    const newRecord = ParticipantData.addCustomParticipant({
-      name,
-      topic,
-      class: classVal,
-      phone
-    });
-
-    addModal.classList.add('hidden');
-    addParticipantForm.reset();
-    showToast(`✅ Added participant "${newRecord.name}" successfully!`);
-
-    // Auto select newly created participant
-    selectParticipant(newRecord);
-  }
 
   /**
    * Toast notification helper
@@ -726,9 +691,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   zoomFitBtn.addEventListener('click', fitToView);
 
   // Modal Controls
-  openAddModalBtn.addEventListener('click', () => addModal.classList.remove('hidden'));
-  closeAddModalBtn.addEventListener('click', () => addModal.classList.add('hidden'));
-  addParticipantForm.addEventListener('submit', handleAddParticipantSubmit);
 
   openDirectoryBtn.addEventListener('click', () => {
     populateDirectoryTable();

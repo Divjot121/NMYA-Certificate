@@ -55,63 +55,19 @@ const INITIAL_PARTICIPANTS = [
   {"name":"Demo Participant","phone":"9876543210","topic":"Debate","class":"8th"}
 ];
 
-const STORAGE_KEY_CUSTOM_PARTICIPANTS = 'lif_custom_participants_v1';
-
 /**
- * Loads all participants (base embedded dataset + any added via UI)
+ * Loads all participants from the authoritative database dataset
  * Assigns sequential IDs starting at 1
  * @returns {Array<Object>}
  */
 function getParticipants() {
-  const customListRaw = localStorage.getItem(STORAGE_KEY_CUSTOM_PARTICIPANTS);
-  let customList = [];
-  try {
-    if (customListRaw) {
-      customList = JSON.parse(customListRaw);
-    }
-  } catch (e) {
-    console.error('Error parsing custom participants from localStorage:', e);
-  }
-
-  const allRecords = [...INITIAL_PARTICIPANTS, ...customList];
-  return allRecords.map((item, index) => ({
+  return INITIAL_PARTICIPANTS.map((item, index) => ({
     id: index + 1,
     name: item.name.trim(),
     phone: item.phone ? item.phone.toString().trim() : null,
     topic: item.topic.trim(),
-    class: item.class.trim(),
-    isCustom: index >= INITIAL_PARTICIPANTS.length
+    class: item.class.trim()
   }));
-}
-
-/**
- * Appends a new participant to local storage
- * @param {Object} participant { name, phone, topic, class }
- * @returns {Object} the newly created record with its assigned ID
- */
-function addCustomParticipant(participant) {
-  const customListRaw = localStorage.getItem(STORAGE_KEY_CUSTOM_PARTICIPANTS);
-  let customList = [];
-  try {
-    if (customListRaw) {
-      customList = JSON.parse(customListRaw);
-    }
-  } catch (e) {
-    console.error('Error reading custom participants:', e);
-  }
-
-  const newRecord = {
-    name: participant.name.trim(),
-    phone: participant.phone ? participant.phone.trim() : null,
-    topic: participant.topic.trim(),
-    class: participant.class.trim()
-  };
-
-  customList.push(newRecord);
-  localStorage.setItem(STORAGE_KEY_CUSTOM_PARTICIPANTS, JSON.stringify(customList));
-
-  const all = getParticipants();
-  return all[all.length - 1];
 }
 
 /**
@@ -139,7 +95,6 @@ function getParticipantById(id) {
 // Expose globally for browser usage
 window.ParticipantData = {
   getParticipants,
-  addCustomParticipant,
   searchParticipantsByName,
   getParticipantById,
   INITIAL_PARTICIPANTS

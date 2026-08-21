@@ -31,8 +31,8 @@ Or import this repository directly in the [Vercel Dashboard](https://vercel.com/
   - **Full-Res PNG**: High-resolution 1492×1054 crisp image.
   - **Single-Page PDF**: Scaled landscape PDF without margins via `jsPDF`.
   - **Print Dialog**: Clean print stylesheet.
-- **Participants Directory**: Searchable, filterable table view across all records with 1-click selection.
-- **Dynamic Participant Registration**: Form to register new participants on the fly (persisted to `localStorage`).
+- **Participants Directory**: Searchable, filterable table view across all authoritative database records with 1-click selection.
+- **Database-Exclusive Records**: Participant records are managed exclusively in the backend database dataset (`js/data.js` and `participants.json`), preventing arbitrary client-side additions.
 - **Fully Responsive**: Mobile-first layout with touch-friendly 48px targets, floating quick-action bar, and responsive auto-fitting canvas preview.
 
 ---

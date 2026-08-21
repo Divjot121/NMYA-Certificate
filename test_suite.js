@@ -115,16 +115,11 @@ assert(getUniqueCertNo({ id: 1 }) === 'LIF-NMYA-2026-001', 'Participant #1 gets 
 assert(getUniqueCertNo({ id: 4 }) === 'LIF-NMYA-2026-004', 'Participant #4 gets LIF-NMYA-2026-004');
 assert(getUniqueCertNo({ id: 47 }) === 'LIF-NMYA-2026-047', 'Participant #47 gets LIF-NMYA-2026-047');
 
-console.log('\n=== TEST SUITE 6: Custom Participant Addition ===');
-const added = window.ParticipantData.addCustomParticipant({
-  name: 'Test New Student',
-  topic: 'Singing',
-  class: '9th',
-  phone: '9876543210'
-});
-assert(added.id === 49, `New custom participant gets ID 49 (got ${added.id})`);
-assert(added.name === 'Test New Student', 'New participant name matches');
-assert(window.ParticipantData.getParticipants().length === 49, 'Total participants now 49');
+console.log('\n=== TEST SUITE 6: Database Integrity & Exclusivity ===');
+const dbParticipants = window.ParticipantData.getParticipants();
+assert(Array.isArray(dbParticipants) && dbParticipants.length === 48, 'Database returns exactly 48 authoritative records');
+assert(window.ParticipantData.getParticipantById(1).name === 'Rajdeep Singh', 'Participant lookup by ID 1 matches authoritative dataset');
+assert(window.ParticipantData.getParticipantById(48).name === 'Demo Participant', 'Participant lookup by ID 48 matches authoritative dataset');
 
 console.log(`\n=============================================`);
 console.log(`TEST SUMMARY: ${passCount} Passed, ${failCount} Failed`);
