@@ -77,10 +77,10 @@ assert(partialSearch.length > 0, `Substring case-insensitive search works (found
 const noMatchSearch = window.ParticipantData.searchParticipantsByName('Unknown Participant XYZ');
 assert(noMatchSearch.length === 0, 'Non-existent name returns empty array (triggers inline error UI)');
 
-console.log('\n=== TEST SUITE 4: Phone Verification Logic ===');
+console.log('\n=== TEST SUITE 4: Phone Verification, Secondary Check & Throttling Logic ===');
 function simulatePhoneVerify(participant, enteredPhone) {
-  if (!participant.phone) return { verified: true, bypass: true };
-  const entered = enteredPhone.trim().replace(/\D/g, '');
+  if (!participant.phone) return { verified: false, reason: 'requires_secondary_check' };
+  const entered = enteredPhone ? enteredPhone.trim().replace(/\D/g, '') : '';
   const actual = participant.phone.trim().replace(/\D/g, '');
   if (!entered) return { verified: false, reason: 'empty' };
   if (entered.length < 10) return { verified: false, reason: 'incomplete' };
@@ -88,16 +88,40 @@ function simulatePhoneVerify(participant, enteredPhone) {
   return { verified: isMatch, reason: isMatch ? 'ok' : 'mismatch' };
 }
 
-// Harnoor #2 verification
+function simulateSecondaryVerify(participant, selectedTopic, selectedClass) {
+  if (!selectedTopic || !selectedClass) return { verified: false, reason: 'incomplete' };
+  const isMatch = (selectedTopic.trim().toLowerCase() === participant.topic.trim().toLowerCase() &&
+                   selectedClass.trim().toLowerCase() === participant.class.trim().toLowerCase());
+  return { verified: isMatch, reason: isMatch ? 'ok' : 'mismatch' };
+}
+
+function simulateThrottling(failedAttempts) {
+  if (failedAttempts >= 5) return { throttled: true, cooldownSeconds: 60 };
+  if (failedAttempts >= 3) return { throttled: true, cooldownSeconds: 30 };
+  return { throttled: false, cooldownSeconds: 0 };
+}
+
+// Harnoor #2 phone verification tests
 const h2 = harnoorMatches[1];
 assert(simulatePhoneVerify(h2, '9815046097').verified === true, 'Full 10-digit phone match succeeds');
 assert(simulatePhoneVerify(h2, '6097').verified === false, 'Partial 4-digit input fails (Full 10-digit required)');
 assert(simulatePhoneVerify(h2, '9999999999').verified === false, 'Mismatched phone number fails');
 assert(simulatePhoneVerify(h2, '').verified === false, 'Empty phone input fails');
 
-// Null phone bypass
+// Null phone record - CANNOT complete Step 2 without secondary check
 const hargunpreet = window.ParticipantData.searchParticipantsByName('Hargunpreet Kaur')[0];
-assert(simulatePhoneVerify(hargunpreet, '').verified === true, 'Null phone record bypasses phone check automatically');
+assert(simulatePhoneVerify(hargunpreet, '').verified === false, 'Null phone record CANNOT bypass Step 2 automatically');
+assert(simulateSecondaryVerify(hargunpreet, 'Declamation', '7th').verified === true, 'Correct secondary check (Topic & Class) succeeds for null-phone participant');
+assert(simulateSecondaryVerify(hargunpreet, 'Debate', '7th').verified === false, 'Incorrect topic in secondary check fails');
+assert(simulateSecondaryVerify(hargunpreet, 'Declamation', '8th').verified === false, 'Incorrect class in secondary check fails');
+assert(simulateSecondaryVerify(hargunpreet, '', '7th').verified === false, 'Incomplete secondary check fails');
+
+// Throttling & Lockout tests
+assert(simulateThrottling(0).throttled === false, '0 failed attempts: Not throttled');
+assert(simulateThrottling(2).throttled === false, '2 failed attempts: Not throttled');
+assert(simulateThrottling(3).throttled === true && simulateThrottling(3).cooldownSeconds === 30, '3 failed attempts: Throttled with 30s cooldown');
+assert(simulateThrottling(4).throttled === true && simulateThrottling(4).cooldownSeconds === 30, '4 failed attempts: Throttled with 30s cooldown');
+assert(simulateThrottling(5).throttled === true && simulateThrottling(5).cooldownSeconds === 60, '5+ failed attempts: Throttled with 60s cooldown');
 
 console.log('\n=== TEST SUITE 5: Unique Certificate Serial Number per ID ===');
 function getUniqueCertNo(participant) {

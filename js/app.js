@@ -29,10 +29,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Verification Elements
   const verificationSection = document.getElementById('verification-section');
+  const phoneVerifyContainer = document.getElementById('phone-verify-container');
   const phoneVerifyInput = document.getElementById('phone-verify-input');
   const verifyBtn = document.getElementById('verify-btn');
+  const secondaryVerifyContainer = document.getElementById('secondary-verify-container');
+  const secTopicSelect = document.getElementById('sec-topic-select');
+  const secClassSelect = document.getElementById('sec-class-select');
+  const secVerifyBtn = document.getElementById('sec-verify-btn');
+  const throttleBanner = document.getElementById('throttle-banner');
+  const throttleTimerSpan = document.getElementById('throttle-timer');
   const verificationMessage = document.getElementById('verification-message');
-  const nullPhoneNotice = document.getElementById('null-phone-notice');
 
   // Form Customization Inputs
   const schoolInput = document.getElementById('school-input');
@@ -80,6 +86,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   let activeAutocompleteIndex = -1;
   let searchResults = [];
   let customCertNoOverride = null;
+  let failedAttemptsCount = 0;
+  let lockoutTimer = null;
+  let lockoutRemainingSeconds = 0;
 
   // Initialize Canvas Renderer
   const renderer = new CertificateRenderer(canvasElement);
@@ -303,30 +312,33 @@ document.addEventListener('DOMContentLoaded', async () => {
       cardPhoneInfo.textContent = `Phone: •••••••••• (Full 10-digit confirmation required)`;
       cardPhoneInfo.className = 'card-phone-info phone-required';
     } else {
-      cardPhoneInfo.textContent = 'Phone: Not Registered (Auto-verified by Topic & Class)';
-      cardPhoneInfo.className = 'card-phone-info phone-none';
+      cardPhoneInfo.textContent = 'Phone: Not Registered (Secondary Verification Required)';
+      cardPhoneInfo.className = 'card-phone-info phone-required';
     }
 
     participantCard.classList.remove('hidden');
     verificationSection.classList.remove('hidden');
 
-    // Reset phone verify state
+    // Reset verify state
     phoneVerifyInput.value = '';
+    if (secTopicSelect) secTopicSelect.value = '';
+    if (secClassSelect) secClassSelect.value = '';
     verificationMessage.classList.add('hidden');
     verificationMessage.textContent = '';
     verificationMessage.className = 'verification-message';
 
     if (participant.phone) {
-      nullPhoneNotice.classList.add('hidden');
-      phoneVerifyInput.parentElement.classList.remove('hidden');
+      if (secondaryVerifyContainer) secondaryVerifyContainer.classList.add('hidden');
+      if (phoneVerifyContainer) phoneVerifyContainer.classList.remove('hidden');
       isVerified = false;
-      phoneVerifyInput.focus();
+      if (lockoutRemainingSeconds === 0) {
+        phoneVerifyInput.focus();
+      }
     } else {
-      // Null phone bypass
-      nullPhoneNotice.classList.remove('hidden');
-      phoneVerifyInput.parentElement.classList.add('hidden');
-      isVerified = true;
-      showVerificationSuccess('✓ Verified via record topic & class (No phone needed)');
+      // Secondary Verification Required for records with no phone on record
+      if (phoneVerifyContainer) phoneVerifyContainer.classList.add('hidden');
+      if (secondaryVerifyContainer) secondaryVerifyContainer.classList.remove('hidden');
+      isVerified = false;
     }
 
     updateCertNoDisplay();
@@ -334,15 +346,63 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   /**
+   * Throttling & Lockout Helper
+   */
+  function handleFailedAttempt() {
+    failedAttemptsCount++;
+    isVerified = false;
+    refreshCertificate();
+
+    if (failedAttemptsCount >= 5) {
+      startThrottleLockout(60);
+    } else if (failedAttemptsCount >= 3) {
+      startThrottleLockout(30);
+    }
+  }
+
+  function startThrottleLockout(durationSeconds) {
+    lockoutRemainingSeconds = durationSeconds;
+    if (lockoutTimer) clearInterval(lockoutTimer);
+
+    setVerificationInputsDisabled(true);
+    updateThrottleDisplay();
+    if (throttleBanner) throttleBanner.classList.remove('hidden');
+
+    lockoutTimer = setInterval(() => {
+      lockoutRemainingSeconds--;
+      if (lockoutRemainingSeconds <= 0) {
+        clearInterval(lockoutTimer);
+        lockoutTimer = null;
+        if (throttleBanner) throttleBanner.classList.add('hidden');
+        setVerificationInputsDisabled(false);
+      } else {
+        updateThrottleDisplay();
+      }
+    }, 1000);
+  }
+
+  function updateThrottleDisplay() {
+    if (throttleTimerSpan) {
+      throttleTimerSpan.textContent = lockoutRemainingSeconds;
+    }
+  }
+
+  function setVerificationInputsDisabled(disabled) {
+    if (phoneVerifyInput) phoneVerifyInput.disabled = disabled;
+    if (verifyBtn) verifyBtn.disabled = disabled;
+    if (secTopicSelect) secTopicSelect.disabled = disabled;
+    if (secClassSelect) secClassSelect.disabled = disabled;
+    if (secVerifyBtn) secVerifyBtn.disabled = disabled;
+  }
+
+  /**
    * Phone Confirmation Validation (Strict 10-Digit Match)
    */
   function verifyPhoneNumber() {
-    if (!currentParticipant) return;
+    if (!currentParticipant || lockoutRemainingSeconds > 0) return;
 
     if (!currentParticipant.phone) {
-      isVerified = true;
-      showVerificationSuccess('✓ Verified');
-      refreshCertificate();
+      verifySecondaryCheck();
       return;
     }
 
@@ -367,13 +427,51 @@ document.addEventListener('DOMContentLoaded', async () => {
     const isMatch = (entered === actual);
 
     if (isMatch) {
+      failedAttemptsCount = 0;
       isVerified = true;
       showVerificationSuccess('✓ Identity Verified! Ready to Generate.');
       refreshCertificate();
     } else {
+      handleFailedAttempt();
+      const attemptsWarning = failedAttemptsCount < 3 
+        ? ` (${3 - failedAttemptsCount} attempt(s) remaining before temporary lockout)` 
+        : (lockoutRemainingSeconds > 0 ? ` (Locked out for ${lockoutRemainingSeconds}s)` : '');
+      showVerificationError(`❌ Phone number mismatch! Did not match the registered record for "${currentParticipant.name}" (${currentParticipant.topic}, Class ${currentParticipant.class}).${attemptsWarning}`);
+    }
+  }
+
+  /**
+   * Secondary Identity Verification (Topic & Class Matching for No-Phone Records)
+   */
+  function verifySecondaryCheck() {
+    if (!currentParticipant || lockoutRemainingSeconds > 0) return;
+
+    const selectedTopic = secTopicSelect ? secTopicSelect.value.trim() : '';
+    const selectedClass = secClassSelect ? secClassSelect.value.trim() : '';
+
+    if (!selectedTopic || !selectedClass) {
+      showVerificationError('⚠️ Please select both the Competition Category and Class to complete secondary verification.');
       isVerified = false;
-      showVerificationError(`❌ Phone number mismatch! Did not match the registered record for "${currentParticipant.name}" (${currentParticipant.topic}, ${currentParticipant.class}).`);
       refreshCertificate();
+      return;
+    }
+
+    const actualTopic = currentParticipant.topic ? currentParticipant.topic.trim().toLowerCase() : '';
+    const actualClass = currentParticipant.class ? currentParticipant.class.trim().toLowerCase() : '';
+
+    const isMatch = (selectedTopic.toLowerCase() === actualTopic && selectedClass.toLowerCase() === actualClass);
+
+    if (isMatch) {
+      failedAttemptsCount = 0;
+      isVerified = true;
+      showVerificationSuccess('✓ Secondary Identity Verification Successful! Ready to Generate.');
+      refreshCertificate();
+    } else {
+      handleFailedAttempt();
+      const attemptsWarning = failedAttemptsCount < 3 
+        ? ` (${3 - failedAttemptsCount} attempt(s) remaining before temporary lockout)` 
+        : (lockoutRemainingSeconds > 0 ? ` (Locked out for ${lockoutRemainingSeconds}s)` : '');
+      showVerificationError(`❌ Secondary check failed! The selected competition category or class does not match the official entry for "${currentParticipant.name}".${attemptsWarning}`);
     }
   }
 
@@ -385,13 +483,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function showVerificationError(msg) {
     const participantInfo = currentParticipant ? ` for ${currentParticipant.name} (${currentParticipant.topic}, Class ${currentParticipant.class})` : '';
-    const whatsappUrl = `https://wa.me/918968413993?text=Hello%2C%20I%20am%20having%20trouble%20verifying%20my%20phone%20number${encodeURIComponent(participantInfo)}%20for%20the%20Nasha%20Mukt%20Yuva%20Certificate.`;
+    const whatsappUrl = `https://wa.me/918968413993?text=Hello%2C%20I%20am%20having%20trouble%20verifying%20my%20identity${encodeURIComponent(participantInfo)}%20for%20the%20Nasha%20Mukt%20Yuva%20Certificate.`;
 
     verificationMessage.innerHTML = `
       <div class="verify-error-content">
         <span>${escapeHtml(msg)}</span>
         <div class="verify-error-action">
-          <span>Facing an issue or forgot registered number?</span>
+          <span>Facing an issue or forgot registered details?</span>
           <a href="${whatsappUrl}" target="_blank" rel="noopener noreferrer" class="verify-contact-link">Contact Us (WhatsApp)</a>
         </div>
       </div>
@@ -415,6 +513,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (editCertNoBtn) {
       editCertNoBtn.textContent = 'Edit';
     }
+    if (phoneVerifyInput) phoneVerifyInput.value = '';
+    if (secTopicSelect) secTopicSelect.value = '';
+    if (secClassSelect) secClassSelect.value = '';
+    verificationMessage.classList.add('hidden');
     searchInput.focus();
     updateCertNoDisplay();
     refreshCertificate();
@@ -636,6 +738,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   changeParticipantBtn.addEventListener('click', resetSelection);
 
   verifyBtn.addEventListener('click', verifyPhoneNumber);
+  if (secVerifyBtn) {
+    secVerifyBtn.addEventListener('click', verifySecondaryCheck);
+  }
   phoneVerifyInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();

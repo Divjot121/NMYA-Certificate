@@ -21,11 +21,9 @@ Or import this repository directly in the [Vercel Dashboard](https://vercel.com/
 
 ## ✨ Features
 
-- **Strict Lookup & Zero Manual Typing**: Search participants from the embedded dataset (47 verified records).
-- **Disambiguation for Duplicate Names**: Distinctly identifies repeating names (e.g. *Harnoor Kaur* across 6th, 7th, and 8th classes) with real-time badges for Topic, Class, and unique Certificate Serial Number.
-- **Identity Confirmation Layer**: Confirms identity via phone number matching (supports full 10-digit number or last 4 digits) and automatically bypasses verification for records with `phone: null`.
-- **Calibrated Canvas Compositing**: Uses HTML5 Canvas to composite dynamic typography (`Cinzel`, `Playfair Display`, `Plus Jakarta Sans`) onto the 1492×1054 certificate template with calibrated baselines and automatic text-fitting.
-- **Unique Certificate Numbers per Participant**: Deterministically maps serial numbers to database record IDs (`LIF-NMYA-2026-001` to `047`).
+- **Identity Confirmation Layer**: Confirms identity via registered 10-digit phone number matching.
+- **Secondary Identity Check for Null Phone Records**: Participants without a phone number on record must pass a secondary challenge (verifying registered Competition Category & Class) to complete Step 2.
+- **Throttling & Lockout Protection**: Repeated failed verification attempts trigger temporary cooldown lockouts (30s on 3 failed attempts, 60s on 5+ failures) with a live countdown timer to prevent brute-force probing.
 - **Fixed Event Details**: Pre-configured for School (`SGHPS CHOWK PRAGDASS`) and Issue Date (`28 August 2026`).
 - **Multiple Export Formats**:
   - **Full-Res PNG**: High-resolution 1492×1054 crisp image.
