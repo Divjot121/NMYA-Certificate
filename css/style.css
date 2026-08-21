@@ -1062,7 +1062,7 @@ body {
   margin-top: auto;
   background: var(--color-surface);
   border-top: 1px solid var(--color-border);
-  padding: 1rem 1.5rem;
+  padding: 1.1rem 1.5rem;
   width: 100%;
   box-sizing: border-box;
 }
@@ -1073,7 +1073,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 1.25rem;
   font-size: 0.8rem;
   color: var(--color-text-muted);
   flex-wrap: wrap;
@@ -1087,10 +1087,123 @@ body {
   color: var(--color-navy-900);
 }
 
+/* Modern Watermark Badge in Footer */
+.footer-watermark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.watermark-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(248, 250, 252, 0.95);
+  border: 1.5px solid var(--color-gold-400);
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.08);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.watermark-badge:hover {
+  transform: translateY(-1.5px);
+  border-color: var(--color-gold-500);
+  box-shadow: 0 6px 16px rgba(217, 119, 6, 0.2);
+  background: #ffffff;
+}
+
+.watermark-text {
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.heart-pulse-anim {
+  display: inline-block;
+  font-size: 0.92rem;
+  animation: heart-beat 1.6s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+  filter: drop-shadow(0 0 3px rgba(239, 68, 68, 0.4));
+}
+
+@keyframes heart-beat {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.28); }
+  35% { transform: scale(1.08); }
+  45% { transform: scale(1.24); }
+}
+
+.brand-gradient-shine {
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  background: linear-gradient(135deg, var(--color-navy-900) 0%, #b45309 50%, var(--color-navy-800) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: uppercase;
+}
+
 .footer-support {
   display: flex;
   align-items: center;
   gap: 0.35rem;
+}
+
+/* Studio Footer Status & Watermark Bar */
+.studio-footer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.75rem;
+  margin-top: 0.75rem;
+  border-top: 1px solid var(--color-border-light);
+  font-size: 0.74rem;
+  color: var(--color-text-muted);
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.studio-spec {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.studio-watermark-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  background: var(--color-navy-50);
+  border: 1px solid var(--color-border);
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+}
+
+.studio-watermark-tag:hover {
+  border-color: var(--color-gold-400);
+  background: #ffffff;
+}
+
+.heart-icon-sm {
+  font-size: 0.78rem;
+  animation: heart-beat 2s infinite ease-in-out;
+}
+
+.brand-text-gold {
+  color: var(--color-navy-900);
+  font-weight: 800;
+  letter-spacing: 0.4px;
+}
+
+/* Tech Partner Card in Support Modal */
+.tech-partner-card {
+  border-color: rgba(217, 119, 6, 0.35) !important;
+  background: linear-gradient(135deg, rgba(254, 243, 199, 0.35), rgba(241, 245, 249, 0.9)) !important;
 }
 
 /* ==========================================================================
