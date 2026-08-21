@@ -12,8 +12,6 @@ const INITIAL_PARTICIPANTS = [
   {"name":"Sharanpreet Kaur","phone":"9814668748","topic":"Debate","class":"8th"},
   {"name":"Gurkirat Singh","phone":"6284763335","topic":"Debate","class":"9th"},
   {"name":"Jasveer Kaur","phone":"9814732793","topic":"Declamation","class":"7th"},
-  {"name":"Hargunpreet Kaur","phone":null,"topic":"Declamation","class":"7th"},
-  {"name":"Chahatnoor Singh","phone":null,"topic":"Declamation","class":"7th"},
   {"name":"Harleen Kaur","phone":"7009000461","topic":"Declamation","class":"7th"},
   {"name":"Chahatnoor Singh","phone":"8283817006","topic":"Declamation","class":"7th"},
   {"name":"Divjot Singh","phone":"9779085865","topic":"Declamation","class":"7th"},
@@ -37,10 +35,10 @@ const INITIAL_PARTICIPANTS = [
   {"name":"Kiratpreet Kaur","phone":"6239554748","topic":"Rangoli","class":"8th"},
   {"name":"Arshpreet Kaur","phone":"8198010973","topic":"Rangoli","class":"8th"},
   {"name":"Ekamdeep Kaur","phone":"9878212401","topic":"Rangoli","class":"8th"},
-  {"name":"Harmandeep S.","phone":"8872130309","topic":"Singing","class":"7th"},
-  {"name":"Japleen K.","phone":"8437700452","topic":"Singing","class":"7th"},
-  {"name":"Hargunpreet K.","phone":"7837178949","topic":"Singing","class":"7th"},
-  {"name":"Paramdeep S.","phone":"8264231807","topic":"Singing","class":"7th"},
+  {"name":"Harmandeep Singh","phone":"8872130309","topic":"Singing","class":"7th"},
+  {"name":"Japleen Kaur","phone":"8437700452","topic":"Singing","class":"7th"},
+  {"name":"Hargunpreet Kaur","phone":"7837178949","topic":"Singing","class":"7th"},
+  {"name":"Paramdeep Singh","phone":"8264231807","topic":"Singing","class":"7th"},
   {"name":"Sehajpreet Kaur","phone":"7814131375","topic":"Poster Making","class":"7th"},
   {"name":"Avneet Kaur","phone":"7340750774","topic":"Poster Making","class":"7th"},
   {"name":"Malika","phone":"7978301990","topic":"Poster Making","class":"7th"},
@@ -51,8 +49,7 @@ const INITIAL_PARTICIPANTS = [
   {"name":"Sharanpreet Kaur","phone":"7973166901","topic":"Poster Making","class":"8th"},
   {"name":"Seerat Kaur","phone":"7973166901","topic":"Poster Making","class":"8th"},
   {"name":"Harleen Kaur","phone":"7986074854","topic":"Poster Making","class":"8th"},
-  {"name":"Harnoor Kaur","phone":"9888818381","topic":"Poster Making","class":"8th"},
-  {"name":"Demo Participant","phone":"9876543210","topic":"Debate","class":"8th"}
+  {"name":"Harnoor Kaur","phone":"9888818381","topic":"Poster Making","class":"8th"}
 ];
 
 /**

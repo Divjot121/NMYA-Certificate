@@ -47,13 +47,13 @@ function assert(condition, message) {
 
 console.log('=== TEST SUITE 1: Dataset & Unique IDs ===');
 const participants = window.ParticipantData.getParticipants();
-assert(participants.length === 48, `Total embedded participants count is 48 (got ${participants.length})`);
+assert(participants.length === 45, `Total embedded participants count is 45 (got ${participants.length})`);
 assert(participants[0].id === 1 && participants[0].name === 'Rajdeep Singh', 'First participant has ID 1 (Rajdeep Singh)');
-assert(participants[47].id === 48 && participants[47].name === 'Demo Participant', 'Last participant has ID 48 (Demo Participant)');
+assert(participants[44].id === 45 && participants[44].name === 'Harnoor Kaur', 'Last participant has ID 45 (Harnoor Kaur)');
 
 // Check unique IDs
 const idSet = new Set(participants.map(p => p.id));
-assert(idSet.size === 48, 'All 48 IDs are unique');
+assert(idSet.size === 45, 'All 45 IDs are unique');
 
 console.log('\n=== TEST SUITE 2: Duplicate Names Disambiguation ===');
 const harnoorMatches = window.ParticipantData.searchParticipantsByName('Harnoor Kaur');
@@ -63,9 +63,8 @@ assert(harnoorMatches[1].topic === 'Rangoli' && harnoorMatches[1].class === '7th
 assert(harnoorMatches[2].topic === 'Poster Making' && harnoorMatches[2].class === '8th' && harnoorMatches[2].phone === '9888818381', 'Harnoor #3 is Poster Making 8th');
 
 const chahatMatches = window.ParticipantData.searchParticipantsByName('Chahatnoor Singh');
-assert(chahatMatches.length === 2, `Searching "Chahatnoor Singh" returns 2 distinct records (got ${chahatMatches.length})`);
-assert(chahatMatches[0].phone === null, 'First Chahatnoor has null phone');
-assert(chahatMatches[1].phone === '8283817006', 'Second Chahatnoor has phone 8283817006');
+assert(chahatMatches.length === 1, `Searching "Chahatnoor Singh" returns 1 verified record with phone (got ${chahatMatches.length})`);
+assert(chahatMatches[0].phone === '8283817006', 'Chahatnoor has phone 8283817006');
 
 console.log('\n=== TEST SUITE 3: Search Edge Cases ===');
 const emptySearch = window.ParticipantData.searchParticipantsByName('');
@@ -108,13 +107,13 @@ assert(simulatePhoneVerify(h2, '6097').verified === false, 'Partial 4-digit inpu
 assert(simulatePhoneVerify(h2, '9999999999').verified === false, 'Mismatched phone number fails');
 assert(simulatePhoneVerify(h2, '').verified === false, 'Empty phone input fails');
 
-// Null phone record - CANNOT complete Step 2 without secondary check
-const hargunpreet = window.ParticipantData.searchParticipantsByName('Hargunpreet Kaur')[0];
-assert(simulatePhoneVerify(hargunpreet, '').verified === false, 'Null phone record CANNOT bypass Step 2 automatically');
-assert(simulateSecondaryVerify(hargunpreet, 'Declamation', '7th').verified === true, 'Correct secondary check (Topic & Class) succeeds for null-phone participant');
-assert(simulateSecondaryVerify(hargunpreet, 'Debate', '7th').verified === false, 'Incorrect topic in secondary check fails');
-assert(simulateSecondaryVerify(hargunpreet, 'Declamation', '8th').verified === false, 'Incorrect class in secondary check fails');
-assert(simulateSecondaryVerify(hargunpreet, '', '7th').verified === false, 'Incomplete secondary check fails');
+// Simulated secondary verification logic check
+const mockNullPhone = { name: 'Test Student', phone: null, topic: 'Declamation', class: '7th' };
+assert(simulatePhoneVerify(mockNullPhone, '').verified === false, 'Null phone record CANNOT bypass Step 2 automatically');
+assert(simulateSecondaryVerify(mockNullPhone, 'Declamation', '7th').verified === true, 'Correct secondary check (Topic & Class) succeeds for null-phone participant');
+assert(simulateSecondaryVerify(mockNullPhone, 'Debate', '7th').verified === false, 'Incorrect topic in secondary check fails');
+assert(simulateSecondaryVerify(mockNullPhone, 'Declamation', '8th').verified === false, 'Incorrect class in secondary check fails');
+assert(simulateSecondaryVerify(mockNullPhone, '', '7th').verified === false, 'Incomplete secondary check fails');
 
 // Throttling & Lockout tests
 assert(simulateThrottling(0).throttled === false, '0 failed attempts: Not throttled');
@@ -137,13 +136,13 @@ const uniqueCertSet = new Set(generatedCertNumbers);
 assert(uniqueCertSet.size === allParticipants.length, `All ${allParticipants.length} participants have unique serial numbers`);
 assert(getUniqueCertNo({ id: 1 }) === 'LIF-NMYA-2026-001', 'Participant #1 gets LIF-NMYA-2026-001');
 assert(getUniqueCertNo({ id: 4 }) === 'LIF-NMYA-2026-004', 'Participant #4 gets LIF-NMYA-2026-004');
-assert(getUniqueCertNo({ id: 47 }) === 'LIF-NMYA-2026-047', 'Participant #47 gets LIF-NMYA-2026-047');
+assert(getUniqueCertNo({ id: 45 }) === 'LIF-NMYA-2026-045', 'Participant #45 gets LIF-NMYA-2026-045');
 
 console.log('\n=== TEST SUITE 6: Database Integrity & Exclusivity ===');
 const dbParticipants = window.ParticipantData.getParticipants();
-assert(Array.isArray(dbParticipants) && dbParticipants.length === 48, 'Database returns exactly 48 authoritative records');
+assert(Array.isArray(dbParticipants) && dbParticipants.length === 45, 'Database returns exactly 45 authoritative records');
 assert(window.ParticipantData.getParticipantById(1).name === 'Rajdeep Singh', 'Participant lookup by ID 1 matches authoritative dataset');
-assert(window.ParticipantData.getParticipantById(48).name === 'Demo Participant', 'Participant lookup by ID 48 matches authoritative dataset');
+assert(window.ParticipantData.getParticipantById(45).name === 'Harnoor Kaur', 'Participant lookup by ID 45 matches authoritative dataset');
 
 console.log('\n=== TEST SUITE 7: Dual Theme (Dark/Light) State Management ===');
 function resolveThemePreference(stored, systemPrefersDark) {
