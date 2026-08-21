@@ -49,7 +49,9 @@ console.log('=== TEST SUITE 1: Dataset & Unique IDs ===');
 const participants = window.ParticipantData.getParticipants();
 assert(participants.length === 45, `Total embedded participants count is 45 (got ${participants.length})`);
 assert(participants[0].id === 1 && participants[0].name === 'Rajdeep Singh', 'First participant has ID 1 (Rajdeep Singh)');
-assert(participants[44].id === 45 && participants[44].name === 'Harnoor Kaur', 'Last participant has ID 45 (Harnoor Kaur)');
+assert(participants[1].id === 2 && participants[1].name === 'Anihant', 'Participant #2 has name Anihant');
+assert(participants[10].id === 11 && participants[10].name === 'Manraj Singh', 'Participant #11 has name Manraj Singh');
+assert(participants[44].id === 45 && participants[44].name === 'Pawandeep Singh', 'Last participant has ID 45 (Pawandeep Singh)');
 
 // Check unique IDs
 const idSet = new Set(participants.map(p => p.id));
@@ -107,6 +109,11 @@ assert(simulatePhoneVerify(h2, '6097').verified === false, 'Partial 4-digit inpu
 assert(simulatePhoneVerify(h2, '9999999999').verified === false, 'Mismatched phone number fails');
 assert(simulatePhoneVerify(h2, '').verified === false, 'Empty phone input fails');
 
+// Malika phone verification test (updated phone 7973301990)
+const malika = window.ParticipantData.searchParticipantsByName('Malika')[0];
+assert(malika.phone === '7973301990', 'Malika phone is 7973301990 per official PDF');
+assert(simulatePhoneVerify(malika, '7973301990').verified === true, 'Malika phone verification succeeds');
+
 // Simulated secondary verification logic check
 const mockNullPhone = { name: 'Test Student', phone: null, topic: 'Declamation', class: '7th' };
 assert(simulatePhoneVerify(mockNullPhone, '').verified === false, 'Null phone record CANNOT bypass Step 2 automatically');
@@ -142,7 +149,7 @@ console.log('\n=== TEST SUITE 6: Database Integrity & Exclusivity ===');
 const dbParticipants = window.ParticipantData.getParticipants();
 assert(Array.isArray(dbParticipants) && dbParticipants.length === 45, 'Database returns exactly 45 authoritative records');
 assert(window.ParticipantData.getParticipantById(1).name === 'Rajdeep Singh', 'Participant lookup by ID 1 matches authoritative dataset');
-assert(window.ParticipantData.getParticipantById(45).name === 'Harnoor Kaur', 'Participant lookup by ID 45 matches authoritative dataset');
+assert(window.ParticipantData.getParticipantById(45).name === 'Pawandeep Singh', 'Participant lookup by ID 45 matches authoritative dataset');
 
 console.log('\n=== TEST SUITE 7: Dual Theme (Dark/Light) State Management ===');
 function resolveThemePreference(stored, systemPrefersDark) {
